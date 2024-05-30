@@ -1,0 +1,124 @@
+import numpy as np
+import pandas as pd
+from typing import List
+from sklearn import preprocessing
+
+def label_encoder(df: pd.DataFrame, 
+                  target: str
+) -> pd.DataFrame:
+    """ LabelEncoder for categorical data convert numerical data\n
+    [Parmaeter]\n
+    - df : Target dataframe
+    - target: Target to encoding
+
+    [Return] \n
+    Label encoded pandas dataframe
+    """
+    
+    from sklearn.preprocessing import LabelEncoder
+    lb = LabelEncoder()
+    df[target] = lb.fit_transform(df[target])
+    
+    return df
+
+def data_scaling(scaler: str, 
+               df: pd.DataFrame, 
+               target: str = None, 
+               ignoreColumn : List[str] = None
+) -> pd.DataFrame:
+    """ Normalization function for feature except target column.\n
+    Must to convert categorical data to numerical data before execution.\n
+
+    [Parameter]
+    1. scaler : type of scaling\n
+        \t- std -> StandardScaler
+        \t- minmax -> MinmaxScaler
+        \t- robust -> RobustScaler
+    2. df : Dataframe to scaling
+    3. target : Target data for the model to learn
+    4. ignoreColumn : Columns to exclude from scaling \n
+    
+    [Return]\n
+    Scaled dataframe
+    """
+    if scaler == "std":
+        scaler = preprocessing.StandardScaler()
+    elif scaler == "minmax":
+        scaler = preprocessing.MinMaxScaler()
+    elif scaler == "robust":
+        scaler = preprocessing.RobustScaler()
+    else:
+        print("Invalid scaler!")
+        exit()
+
+    if ignoreColumn != None:
+        # 무시할 열 따로 저장
+        dropdata = df[ignoreColumn].copy()
+        # 무시할 열 제거
+        df = df.drop(columns = ignoreColumn)
+
+    # 타겟 열 제거한 데이터
+    data = df.drop([target], axis=1).reset_index(drop=True)
+    target_column = df[target].reset_index(drop=True)
+
+    # 데이터 스케일링
+    scaled_data = scaler.fit_transform(data)
+    scaled_df = pd.DataFrame(scaled_data, columns=data.columns)
+    
+    if ignoreColumn != None:
+        # 스케일링한 데이터에 무시할 열 추가    
+        for col in ignoreColumn:
+            scaled_df[col] = dropdata[col].values
+
+    # 타겟 열 추가
+    scaled_df[target] = target_column
+
+    return scaled_df
+
+def engNum2Num(df: pd.DataFrame, 
+          target : str
+) -> List[float]:
+    """ Converting English numeric notation to numbers """
+    def split_alpha_numeric(s):
+        import re
+        match = re.match(r'(\d+\.\d+)(\D+)', s)
+        if match:
+            numbers = float(match.group(1))
+            letters = match.group(2)
+            if   letters == 'B': numbers *= 1000000000
+            elif letters == 'M': numbers *= 1000000
+            elif letters == 'K': numbers *= 1000
+            else: return None, None
+            return float(numbers), letters
+        else:
+            return None, None
+    
+    df = df[target]
+
+    result = []
+    for s in df:
+        if pd.isna(s):
+            result.append(pd.NA)
+            continue
+
+        n, _ = split_alpha_numeric(s)
+        result.append(n)
+
+    return result
+
+def dropIQR(df: pd.DataFrame, 
+        per : float = 0.25
+) -> pd.DataFrame:
+    """ Drop outlier use IQR \n
+    df: Dataframe for drop outlier \n
+    per: Percenatge of outlier range (default: 0.25)\n
+    Return: Dataframe droped outlier. """
+    # Set outlier range
+    Q1 = df.quantile(per)
+    Q3 = df.quantile(1-per)
+    IQR = Q3 - Q1
+
+    # Detect and drop outiler over IQR range
+    df = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+    return df
