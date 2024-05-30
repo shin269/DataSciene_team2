@@ -51,26 +51,25 @@ def data_scaling(scaler: str,
         print("Invalid scaler!")
         exit()
 
+    # Save and drop ignore column
     if ignoreColumn != None:
-        # 무시할 열 따로 저장
         dropdata = df[ignoreColumn].copy()
-        # 무시할 열 제거
         df = df.drop(columns = ignoreColumn)
 
-    # 타겟 열 제거한 데이터
+    # Remove target data
     data = df.drop([target], axis=1).reset_index(drop=True)
     target_column = df[target].reset_index(drop=True)
 
-    # 데이터 스케일링
+    # Scalining data
     scaled_data = scaler.fit_transform(data)
     scaled_df = pd.DataFrame(scaled_data, columns=data.columns)
     
-    if ignoreColumn != None:
-        # 스케일링한 데이터에 무시할 열 추가    
+    # Add ignorecolumn to scaled data
+    if ignoreColumn != None:   
         for col in ignoreColumn:
             scaled_df[col] = dropdata[col].values
 
-    # 타겟 열 추가
+    # Add target data
     scaled_df[target] = target_column
 
     return scaled_df
