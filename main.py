@@ -7,13 +7,10 @@ import utils.visualization as vis
 import utils.dataloader as dl
 
 if __name__ == '__main__':
-    # Data path with darty data
-    file_path = './datasets/Anomalous_Data.csv'
-
     # Load data
+    file_path = './datasets/Anomalous_Data.csv'
     data = dl.dataLoad(file_path)
-
-    data = pd.read_csv(file_path)
+    
     data = data.drop(columns=['날짜'])
 
     # Check number of null data
