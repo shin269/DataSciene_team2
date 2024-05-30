@@ -6,24 +6,24 @@ import utils.datapreprocessing as dp
 import utils.visualization as vis
 
 if __name__ == '__main__':
-    # 이 파일은 결측치를 추가한 파일입니다!
+    # Data path with darty data
     file_path = './datasets/Anomalous_Data.csv'
 
+    # Load data
     data = pd.read_csv(file_path)
     data = data.drop(columns=['날짜'])
 
-    # Null 값 확인
+    # Check number of null data
     print(data.isnull().sum())
 
-    warnings.filterwarnings('ignore')
+    warnings.filterwarnings('ignore') # Error ignore
+    plt.rcParams['font.family'] = 'Malgun Gothic'  # Fonts of window for korean
+    plt.rcParams['font.size'] = 12  # Set defualt font size
 
-    plt.rcParams['font.family'] = 'Malgun Gothic'  # 윈도우에서 한글 폰트 설정 예시
-    plt.rcParams['font.size'] = 12  # 기본 폰트 크기 설정
-
-    # Null 값 처리 (예: 평균 값으로 채우기)
+    # Fill null data use mean
     data.fillna(data.mean(), inplace=True)
 
-    # 이상치 처리 (예: IQR을 이용한 제거)
+    # Drop outlier use IQR
     data = dp.dropIQR(data) 
 
     # Visualization that distribution of data calumns
