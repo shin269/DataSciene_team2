@@ -4,12 +4,15 @@ import matplotlib.pyplot as plt
 import warnings
 import utils.datapreprocessing as dp
 import utils.visualization as vis
+import utils.dataloader as dl
 
 if __name__ == '__main__':
     # Data path with darty data
     file_path = './datasets/Anomalous_Data.csv'
 
     # Load data
+    data = dl.dataLoad(file_path)
+
     data = pd.read_csv(file_path)
     data = data.drop(columns=['날짜'])
 
