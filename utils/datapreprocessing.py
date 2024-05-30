@@ -75,7 +75,7 @@ def data_scaling(scaler: str,
     return scaled_df
 
 def engNum2Num(df: pd.DataFrame, 
-          target : str
+               target : str
 ) -> List[float]:
     """ Converting English numeric notation to numbers """
     def split_alpha_numeric(s):
@@ -121,3 +121,45 @@ def dropIQR(df: pd.DataFrame,
     df = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
 
     return df
+
+def fillDate(data_path : str,
+             start_date : str,
+             end_date : str,
+             save_file_name : str,
+             save_file_path : str = './',
+             encoding_type : str = 'cp949',
+             have_index : bool = False
+) -> None:
+    """ Fill empty date for data """
+    data_type = data_path.split('.')[-1]
+
+    # Data Load
+    try:
+        if   data_type == 'csv': df = pd.read_csv(data_path)
+        elif data_type == 'xlsx': df = pd.read_excel(data_path)
+    except:
+        print("Invalid file type!")
+        exit()
+
+    # Create data frame of start to end date
+    date_range = pd.date_range(start = start_date, end = end_date)
+    date_range_formatted = date_range.strftime('%Y%m%d')
+
+    # Fill empty date
+    new_df = pd.DataFrame({'날짜': date_range_formatted})
+    for _, row in new_df.iterrows():
+        if row['날짜'] not in df['날짜'].values: 
+            # Empty data check and store
+            df = df.append(row, ignore_index=True)
+
+    df.sort_values(by='날짜',inplace=True)
+    df['날짜'] = df['날짜'].str.replace('-','')
+
+    # Save file 
+    save_path = save_file_path + save_file_name
+    try:
+        df.to_csv(save_path, encoding = encoding_type, index = have_index)
+        print(f"Suceess save file to {save_path}")
+    except:
+        print("Fail save file!")
+        exit()
