@@ -27,4 +27,22 @@ if __name__ == '__main__':
     data = dp.dropIQR(data) 
 
     # Visualization that distribution of data calumns
-    vis.visDistOfData(data, 3)
+    # vis.visDistOfData(data, 3)
+
+
+    """ Data Scaling """
+    # Data Scaling with standardScaler
+    std_df = dp.data_scaling("std", data, '서울')
+    # Data Scaling with minmaxScaler
+    mm_df = dp.data_scaling("minmax", data, '서울')
+    # Data Scaling with robustScaler
+    rb_df = dp.data_scaling("robust", data, '서울')
+
+    print("Standard scaler")
+    dp.findKBestFeature(std_df, data['서울'])
+    print("Minmax Scaler")
+    dp.findKBestFeature(mm_df, data['서울'])
+    print("Robust Scaler")
+    dp.findKBestFeature(rb_df, data['서울'])
+
+    

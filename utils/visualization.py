@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import seaborn as sns
 from typing import Tuple
+
 def visDistOfData(df : pd.DataFrame,
                   row_len : int = 3,
                   fig_size : Tuple[int, int] = (15,12)
