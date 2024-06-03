@@ -163,3 +163,28 @@ def fillDate(data_path : str,
     except:
         print("Fail save file!")
         exit()
+
+def findKBestFeature(df : pd.DataFrame, 
+                     target : pd.DataFrame, 
+                     select_k : int = 10
+) -> None:
+    from sklearn.feature_selection import SelectKBest, f_regression
+
+    X = df
+    Y = target
+
+    selector = SelectKBest(score_func=f_regression, k = select_k)
+    X_new = selector.fit_transform(X,Y)
+
+    selected_features = X.columns[selector.get_support()]
+    scores = selector.scores_
+
+    selected_features_scores = dict(zip(X.columns, scores))
+    selected_features_sorted = sorted(selected_features_scores.items(), key = lambda item:item[1], reverse= True)
+
+    print("\n[Selected Features and their scores]")
+    cnt = 1
+    for feature, score in selected_features_sorted:
+        if feature in selected_features:
+            print(f"{cnt}. {feature}: {score:.4f}")
+            cnt += 1
