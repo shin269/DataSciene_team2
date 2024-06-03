@@ -5,7 +5,6 @@ import warnings
 import utils.datapreprocessing as dp
 import utils.visualization as vis
 import utils.dataloader as dl
-import utils.evaluation as evl
 
 if __name__ == '__main__':
     # Load data
@@ -28,8 +27,7 @@ if __name__ == '__main__':
     data = dp.dropIQR(data) 
 
     # Visualization that distribution of data calumns
-    # vis.visDistOfData(data, 3)
-
+    vis.visDistOfData(data, 3)
 
     """ Data Scaling """
     # Data Scaling with standardScaler
@@ -103,4 +101,4 @@ if __name__ == '__main__':
     # Prnint MSE 
     print('\nMean lr Cross validation MSE:', round(np.mean(cv_mse[::2]),4))
     print('Mean of rf Cross validation MSE:', round(np.mean(cv_mse[1::2]),4))
-        
+    
